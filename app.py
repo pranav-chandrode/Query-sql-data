@@ -3,24 +3,19 @@ import gradio as gr
 import sqlite3
 from langchain.llms import OpenAI
 from langchain_community.utilities import SQLDatabase
-#from langchain.sql_database import SQLDatabase
 from langchain_experimental.sql import SQLDatabaseChain
+from dotenv import load_dotenv; load_dotenv()
 
-# Fetch the OpenAI API key from environment variables
+
 OPENAI_API_KEY = os.getenv('openai')
 if OPENAI_API_KEY is None:
     raise ValueError("OpenAI API key is not set in environment variables.")
 
-# Set the OpenAI API key for the OpenAI library
+
 os.environ['OPENAI_API_KEY'] = OPENAI_API_KEY
-#os.environ("openai")
-# Set your OpenAI API key (replace 'your-openai-api-key-here' with your actual key)
 
-
-# Global variable to store the database path
 db_path = None
 
-# Function to upload and set the SQLite database
 def upload_database(db_file):
     global db_path
     db_path = db_file.name  # Get the path of the uploaded file
@@ -34,14 +29,8 @@ def query_sql_db(query):
     try:
         # Connect to the uploaded SQLite database
         input_db = SQLDatabase.from_uri(f"sqlite:///{db_path}")
-        
-        # Create an instance of the OpenAI model
         openai_llm = OpenAI()
-        
-        # Use the LLM instance in the SQLDatabaseChain
         db_chain = SQLDatabaseChain.from_llm(openai_llm, input_db, verbose=False)
-        
-        # Execute the query
         result = db_chain.run(query)
         return result
     except Exception as e:
